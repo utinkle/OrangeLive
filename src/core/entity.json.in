@@ -1,0 +1,9 @@
+{
+    "appid": "@PROJECT_APP_ID@",
+    "descriptor": "@PROJECT_APP_DESCRIPTOR@",
+    "version": "@PROJECT_APP_VERSION@",
+    "description": "",
+    "features": [],
+    "changelog": "",
+    "default": true
+}

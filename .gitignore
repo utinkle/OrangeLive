@@ -1,0 +1,8 @@
+#  user 临时文件
+*.user
+
+# qtc 目录
+.qt/
+
+# 构建目录
+build/

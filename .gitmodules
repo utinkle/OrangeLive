@@ -1,0 +1,9 @@
+[submodule "third_party/third_party/CCQuickStartup"]
+	path = third_party/third_party/CCQuickStartup
+	url = https://github.com/cccccccb/CCQuickStartup.git
+[submodule "third_party/CCQuickStartup"]
+	path = third_party/CCQuickStartup
+	url = https://github.com/cccccccb/CCQuickStartup.git
+[submodule "third_party/MobileUI"]
+	path = third_party/MobileUI
+	url = https://github.com/utinkle/MobileUI.git
