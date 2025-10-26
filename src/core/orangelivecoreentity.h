@@ -2,8 +2,12 @@
 #define ORANGELIVECOREENTITY_H
 
 #include <QObject>
+#include <QSharedPointer>
 
 #include "interface/appstartupentityinterface.h"
+
+class OLModuleLoader;
+class OLModuleVersionControl;
 
 class OrangeLiveCoreEntity : public QObject, public AppStartupEntityInterface
 {
@@ -16,7 +20,15 @@ public:
     ~OrangeLiveCoreEntity();
 
     QUrl entityModulePath() const;
+    void initialize(QQmlApplicationEngine *engine);
     void finishedLoading(QQmlApplicationEngine *engine);
+
+private:
+    void initializeModuleInformation();
+
+private:
+    QScopedPointer<OLModuleLoader> loader;
+    QHash<QString, QSharedPointer<OLModuleVersionControl>> moduleVCHash;
 };
 
 #endif // ORANGELIVECOREENTITY_H

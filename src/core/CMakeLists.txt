@@ -63,6 +63,11 @@ qt_add_plugin(OrangeLiveCoreEntity
     CLASS_NAME OrangeLiveCoreEntity
     orangelivecoreentity.cpp
     orangelivecoreentity.h
+    olmoduleinformation.h
+    olmoduleversioncontrol.h
+    olmoduleversioncontrol.cpp
+    olmoduleloader.h
+    olmoduleloader.cpp
 )
 
 target_include_directories(OrangeLiveCoreEntity PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
@@ -80,6 +85,8 @@ qt_add_resources(OrangeLiveCoreEntity "entity_qml"
     FILES
         ${entity_qml_resource_files}
 )
+
+target_compile_definitions(OrangeLiveCoreEntity PRIVATE ORANGE_ARCH_STRING="${ANDROID_ABI}")
 
 target_link_libraries(OrangeLiveCoreEntity PRIVATE
     Qt::Quick
