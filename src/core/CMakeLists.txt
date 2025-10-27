@@ -38,14 +38,14 @@ set_target_properties(OrangeLiveCorePreload PROPERTIES
 
 qt_add_resources(OrangeLiveCorePreload "preload_qml"
     PREFIX
-        "/"
+        "/OL.Core"
     FILES
         ${preload_qml_resource_files}
 )
 
 qt_add_resources(OrangeLiveCorePreload "preload_img"
     PREFIX
-        "/"
+        "/OL.Core"
     FILES
         ${preload_img_resource_files}
 )
@@ -58,6 +58,8 @@ target_link_libraries(OrangeLiveCorePreload PRIVATE
     CCQuickStartup
 )
 
+find_package(Qt6 REQUIRED COMPONENTS Quick)
+
 qt_add_plugin(OrangeLiveCoreEntity
     SHARED
     CLASS_NAME OrangeLiveCoreEntity
@@ -68,6 +70,8 @@ qt_add_plugin(OrangeLiveCoreEntity
     olmoduleversioncontrol.cpp
     olmoduleloader.h
     olmoduleloader.cpp
+    olmoduletemplate.h
+    olmoduletemplate.cpp
 )
 
 target_include_directories(OrangeLiveCoreEntity PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
@@ -81,7 +85,7 @@ file(GLOB entity_qml_resource_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} qml/ent
 
 qt_add_resources(OrangeLiveCoreEntity "entity_qml"
     PREFIX
-        "/"
+        "/OL.Core"
     FILES
         ${entity_qml_resource_files}
 )
@@ -93,4 +97,5 @@ target_link_libraries(OrangeLiveCoreEntity PRIVATE
     Qt::QuickControls2
     CCQuickStartup
 )
+target_link_libraries(OrangeLiveCoreEntity PRIVATE Qt6::Quick)
 

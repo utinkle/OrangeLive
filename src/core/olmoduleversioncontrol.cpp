@@ -59,6 +59,30 @@ OLModuleInformation OLModuleVersionControl::currentVersion() const
     return dd->currentVersion;
 }
 
+void OLModuleVersionControl::setCurrentVersion(const OLModuleInformation &information)
+{
+    if (information.name != dd->name) {
+        qWarning() << "[OLModuleVC] module set current version failed!";
+        return;
+    }
+
+    if (dd->currentVersion.version == information.version)
+        return;
+
+    dd->currentVersion = information;
+    Q_EMIT currentVersionChanged();
+}
+
+OLModuleInformation OLModuleVersionControl::minVersion() const
+{
+    return dd->versions.isEmpty() ? OLModuleInformation() : *dd->versions.first();
+}
+
+OLModuleInformation OLModuleVersionControl::maxVersion() const
+{
+    return dd->versions.isEmpty() ? OLModuleInformation() : *dd->versions.last();
+}
+
 QQmlListProperty<OLModuleInformation> OLModuleVersionControl::allVersions()
 {
     return QQmlListProperty<OLModuleInformation>(this, &dd->versions);
@@ -75,7 +99,7 @@ void OLModuleVersionControl::addVersion(const OLModuleInformation &version)
         if (OLModuleVersionControlPrivate::versionGreaterThan((*it)->version, version.version))
             continue;
 
-        dd->versions.insert(--it, new OLModuleInformation(version));
+        dd->versions.insert(it, new OLModuleInformation(version));
     }
 }
 
@@ -91,4 +115,3 @@ void OLModuleVersionControl::removeVersion(const OLModuleInformation &version)
         return version.version == info->version;
     });
 }
-

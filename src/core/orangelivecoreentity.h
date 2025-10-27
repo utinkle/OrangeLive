@@ -25,10 +25,10 @@ public:
 
 private:
     void initializeModuleInformation();
+    void installAndLoadDefaultModules();
 
 private:
     QScopedPointer<OLModuleLoader> loader;
-    QHash<QString, QSharedPointer<OLModuleVersionControl>> moduleVCHash;
 };
 
 #endif // ORANGELIVECOREENTITY_H

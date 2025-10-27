@@ -22,5 +22,5 @@ void OrangeLiveCorePreload::aboutToPreload(QQmlApplicationEngine *engine)
 
 QUrl OrangeLiveCorePreload::preloadModulePath() const
 {
-    return QUrl("qrc:///qml/preload/PreloadWindow.qml");
+    return QUrl("qrc:///OL.Core/qml/preload/PreloadWindow.qml");
 }

@@ -1,6 +1,6 @@
 #include "orangelivecoreentity.h"
 #include "olmoduleloader.h"
-#include "olmoduleversioncontrol.h"
+#include "olmoduletemplate.h"
 
 #include <QQmlContext>
 #include <QQmlApplicationEngine>
@@ -12,10 +12,12 @@
 #include <appstartupinstance.h>
 #include <items/appstartupmodulegroup.h>
 
+#define HOME_PAGE_NAME "HomePage"
+
 
 OrangeLiveCoreEntity::OrangeLiveCoreEntity(QObject *parent)
     : QObject(parent)
-    , loader(new OLModuleLoader(this))
+    , loader(nullptr)
 {
 
 }
@@ -27,14 +29,23 @@ OrangeLiveCoreEntity::~OrangeLiveCoreEntity()
 
 QUrl OrangeLiveCoreEntity::entityModulePath() const
 {
-    return QUrl("qrc:///qml/entity/MainWindow.qml");
+    return QUrl("qrc:///OL.Core/qml/entity/MainWindow.qml");
 }
 
 void OrangeLiveCoreEntity::initialize(QQmlApplicationEngine *engine)
 {
-    engine->rootContext()->setContextProperty("OLModuleLoader", loader.get());
+    if (loader.isNull()) {
+        loader.reset(new OLModuleLoader(engine, this));
+    }
+
+    qmlRegisterType<OLModuleTemplate>("OL.Core", 1, 0, "OLModuleTemplate");
+    qmlRegisterSingletonType<OLModuleLoader>("OL.Core", 1, 0, "OLModuleLoader",
+                                             [&](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject *{
+        return loader.get();
+    });
 
     initializeModuleInformation();
+    installAndLoadDefaultModules();
 }
 
 void OrangeLiveCoreEntity::finishedLoading(QQmlApplicationEngine *engine)
@@ -51,19 +62,18 @@ void OrangeLiveCoreEntity::initializeModuleInformation()
     const auto &moduleEntryInfo = defaultMouduleDir.entryInfoList(QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot);
 
     for (const auto &moduleInfo : moduleEntryInfo) {
-        auto modules = loader->resolveModule(moduleInfo.absoluteFilePath());
-        for (auto module : modules) {
-            QSharedPointer<OLModuleVersionControl> vc;
-            if (moduleVCHash.contains(module.name)) {
-                vc = moduleVCHash.value(module.name);
-            } else {
-                vc = QSharedPointer<OLModuleVersionControl>::create(module.name, this);
-                moduleVCHash.insert(module.name, vc);
-            }
+        loader->resolveModule(moduleInfo.absoluteFilePath());
+    }
+}
 
-            vc->addVersion(module);
-
-            // 接着处理插件的依赖关系
+void OrangeLiveCoreEntity::installAndLoadDefaultModules()
+{
+    for (const auto &moduleName : loader->allModules()) {
+        auto information = loader->moduleInformation(moduleName);
+        if (information.moduleType == OLModuleInformation::Component
+            || information.name == HOME_PAGE_NAME) {
+            // 组件和首页需要默认加载
+            loader->loadModule(information);
         }
     }
 }
