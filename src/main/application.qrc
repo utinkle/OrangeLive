@@ -1,9 +1,5 @@
 <RCC>
     <qresource prefix="/">
         <file>qtquickcontrols2.conf</file>
-        <file>qml/PreloadWindow.qml</file>
-        <file>qml/preload/PreloadOverlay.qml</file>
-        <file>qml/preload/Countdown.qml</file>
-        <file>qml/entity/MainWindow.qml</file>
     </qresource>
 </RCC>

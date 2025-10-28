@@ -5,6 +5,7 @@
 
 #include "olmoduleinformation.h"
 
+class QQuickItem;
 class QQmlComponent;
 class OLModuleVersionControl;
 
@@ -15,6 +16,7 @@ class OLModuleLoader : public QObject
     Q_PROPERTY(QStringList allModules READ allModules NOTIFY allModulesChanged FINAL)
     Q_PROPERTY(QStringList loadedModules READ loadedModules NOTIFY loadedModulesChanged FINAL)
     Q_PROPERTY(QQmlComponent *moduleTemplate READ moduleTemplate WRITE setModuleTemplate NOTIFY moduleTemplateChanged FINAL)
+    Q_PROPERTY(QQmlListProperty<QQuickItem> runingModuleItems READ runingModuleItems NOTIFY runingModuleItemsChanged FINAL)
 
 public:
     explicit OLModuleLoader(QQmlEngine *engine, QObject *parent = nullptr);
@@ -28,6 +30,7 @@ public:
     Q_INVOKABLE QList<OLModuleInformation> moduleDepents(const OLModuleInformation &information) const;
 
     Q_INVOKABLE OLModuleVersionControl *moduleVC(const QString &name);
+    Q_INVOKABLE OLModuleInformation moduleInformation(const QString &name);
 
     QQmlComponent *moduleTemplate() const;
     void setModuleTemplate(QQmlComponent *moduleTemplate);
@@ -35,12 +38,13 @@ public:
     QStringList allModules() const;
     QStringList loadedModules() const;
 
-    Q_INVOKABLE OLModuleInformation moduleInformation(const QString &name);
+    QQmlListProperty<QQuickItem> runingModuleItems();
 
 Q_SIGNALS:
     void moduleTemplateChanged();
     void allModulesChanged();
     void loadedModulesChanged();
+    void runingModuleItemsChanged();
 
 private:
     OLModuleLoaderPrivate *dd;

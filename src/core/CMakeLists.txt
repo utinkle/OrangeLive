@@ -56,6 +56,7 @@ target_link_libraries(OrangeLiveCorePreload PRIVATE
     Qt::Quick
     Qt::QuickControls2
     CCQuickStartup
+    MobileUI::MobileUI
 )
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)

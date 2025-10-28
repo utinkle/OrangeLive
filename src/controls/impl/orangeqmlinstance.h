@@ -9,12 +9,10 @@
 class OrangeQmlInstance : public QObject
 {
     Q_OBJECT
-    QML_NAMED_ELEMENT("OrangeLive")
+    QML_NAMED_ELEMENT(OrangeLive)
     QML_SINGLETON
 
 public:
-    explicit OrangeQmlInstance(QObject *parent = nullptr);
-
     Q_INVOKABLE QUrl toTokIconUrl(const QString &name, const QColor &color);
 };
 

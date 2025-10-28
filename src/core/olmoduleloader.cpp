@@ -31,6 +31,7 @@ struct OLModuleData {
     LoadStatus loadStatus;
     OLModuleInformation information;
     QSharedPointer<AppStartupModuleGroup> module;
+    QPointer<QQuickItem> templateItem;
 
     QSet<QString> dependents;
 };
@@ -47,6 +48,7 @@ public:
     QHash<QString, QString> moduleNameIdHash;
     QHash<QString, QSharedPointer<OLModuleData>> moduleMaps;
     QHash<QString, QSharedPointer<OLModuleVersionControl>> moduleVCHash;
+    QList<QQuickItem *> runningModuleItems;
 
 public:
     OLModuleInformation assignInformation(const QSharedPointer<AppStartupModuleGroup> &module, const QString &path)
@@ -170,13 +172,17 @@ public:
         if (auto item = findModuleSurfaceItem(templateItem))
             data->module->setSurfaceItem(item);
 
-        QObject::connect(data->module.data(), &AppStartupModuleGroup::loadedChanged, qq, [&]() {
+        QObject::connect(data->module.data(), &AppStartupModuleGroup::loadedChanged, qq, [&, templateItem]() {
             data->loadStatus = OLModuleData::LOADED;
+            data->templateItem = templateItem;
+
             auto vc = moduleVCHash.value(data->information.name);
             if (!vc.isNull()) {
                 vc->setCurrentVersion(data->information);
             }
 
+            runningModuleItems.append(templateItem);
+            Q_EMIT qq->runingModuleItemsChanged();
             Q_EMIT qq->loadedModulesChanged();
         }, Qt::SingleShotConnection);
 
@@ -216,6 +222,15 @@ public:
         module->loadStatus = OLModuleData::UNLOADING;
         AppStartupInstance::instance()->unload(module->module);
         module->loadStatus= OLModuleData::UNLOADED;
+
+        runningModuleItems.removeOne(module->templateItem);
+
+        Q_EMIT qq->runingModuleItemsChanged();
+        Q_EMIT qq->loadedModulesChanged();
+
+        module->templateItem->deleteLater();
+        module->templateItem.clear();
+
         return true;
     }
 
@@ -387,6 +402,11 @@ QStringList OLModuleLoader::loadedModules() const
     }
 
     return result;
+}
+
+QQmlListProperty<QQuickItem> OLModuleLoader::runingModuleItems()
+{
+    return QQmlListProperty<QQuickItem>(this, &dd->runningModuleItems);
 }
 
 OLModuleInformation OLModuleLoader::moduleInformation(const QString &name)

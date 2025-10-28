@@ -4,6 +4,7 @@ import QtQuick.Controls.Material
 import QtQuick.Effects
 
 import CCStartup
+import OL.Control
 
 AppPreloadItem {
     id: root
@@ -15,7 +16,7 @@ AppPreloadItem {
             id: skipButton
             anchors.right: parent.right
             anchors.top: parent.top
-            anchors.topMargin: 10
+            anchors.topMargin: 10 + Style.statusBarHeight
             anchors.rightMargin: 10
 
             Material.background: Qt.color("#CCE04F5F")

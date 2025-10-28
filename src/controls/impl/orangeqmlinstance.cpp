@@ -3,10 +3,6 @@
 #include <QQuickWindow>
 #include <QUrlQuery>
 
-OrangeQmlInstance::OrangeQmlInstance(QObject *parent)
-    : QObject{parent}
-{}
-
 QUrl OrangeQmlInstance::toTokIconUrl(const QString &name, const QColor &color)
 {
     QUrl url;
