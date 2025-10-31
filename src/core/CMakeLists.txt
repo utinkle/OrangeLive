@@ -9,6 +9,7 @@ file(GLOB preload_img_resource_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} resour
 
 qt_add_plugin(OrangeLiveCorePreload
     SHARED
+    PLUGIN_TYPE OLCore
     CLASS_NAME OrangeLiveCorePreload
     orangelivecorepreload.h orangelivecorepreload.cpp
 )
@@ -33,7 +34,7 @@ target_include_directories(OrangeLiveCorePreload PRIVATE ${CMAKE_CURRENT_BINARY_
 
 set_target_properties(OrangeLiveCorePreload PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY
-    ${CMAKE_BINARY_DIR}/Extension/Core/Preload
+    ${CMAKE_BINARY_DIR}/Extension/Core/
 )
 
 qt_add_resources(OrangeLiveCorePreload "preload_qml"
@@ -50,7 +51,11 @@ qt_add_resources(OrangeLiveCorePreload "preload_img"
         ${preload_img_resource_files}
 )
 
-target_compile_definitions(OrangeLiveCorePreload PRIVATE ORANGE_ARCH_STRING="${ANDROID_ABI}")
+target_compile_definitions(OrangeLiveCorePreload
+    PRIVATE
+    ORANGE_ARCH_STRING="${ANDROID_ABI}"
+    OLCORE_APP_DESCRIPTOR="${PROJECT_APP_DESCRIPTOR}"
+)
 
 target_link_libraries(OrangeLiveCorePreload PRIVATE
     Qt::Quick
@@ -59,10 +64,9 @@ target_link_libraries(OrangeLiveCorePreload PRIVATE
     MobileUI::MobileUI
 )
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
-
 qt_add_plugin(OrangeLiveCoreEntity
     SHARED
+    PLUGIN_TYPE OLCore
     CLASS_NAME OrangeLiveCoreEntity
     orangelivecoreentity.cpp
     orangelivecoreentity.h
@@ -79,7 +83,7 @@ target_include_directories(OrangeLiveCoreEntity PRIVATE ${CMAKE_CURRENT_BINARY_D
 
 set_target_properties(OrangeLiveCoreEntity PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY
-    ${CMAKE_BINARY_DIR}/Extension/Entity
+    ${CMAKE_BINARY_DIR}/Extension/Core
 )
 
 file(GLOB entity_qml_resource_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} qml/entity/*.qml)
@@ -98,5 +102,4 @@ target_link_libraries(OrangeLiveCoreEntity PRIVATE
     Qt::QuickControls2
     CCQuickStartup
 )
-target_link_libraries(OrangeLiveCoreEntity PRIVATE Qt6::Quick)
 

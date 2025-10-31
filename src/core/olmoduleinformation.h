@@ -27,6 +27,7 @@ public:
     QString workPath;       // 插件的工作目录
     QString version;        // 插件的版本号
     QStringList depends;    // 插件的依赖项
+    bool    autoLoad;       // 插件是否自动加载
 };
 
 #endif // OLMODULEINFORMATION_H

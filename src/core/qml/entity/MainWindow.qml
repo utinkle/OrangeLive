@@ -19,6 +19,7 @@ AppStartupItem {
             anchors.fill: parent
 
             ModuleView {
+                id: moduleView
                 anchors.fill: parent
             }
 

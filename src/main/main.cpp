@@ -15,5 +15,4 @@ int main(int argc, char *argv[])
     startupInstance.addModulePath(QLibraryInfo::path(QLibraryInfo::DataPath));
     startupInstance.addModulePath(QLibraryInfo::path(QLibraryInfo::DataPath) + QDir::separator() + ORANGE_ARCH_STRING);
     return startupInstance.exec(argc, argv);
-    return 0;
 }

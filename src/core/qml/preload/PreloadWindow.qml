@@ -33,7 +33,7 @@ AppPreloadItem {
         }
     }
 
-    autoExitOverlay: false
+    autoExitOverlay: true
     overlayExitWhen: !preloadCountdown.running
     transitionGroup:  FlickTransition {}
     initialProperties: InitialProperties {

@@ -1,59 +1,40 @@
 import QtQuick
+import QtQuick.Controls
 
 import OL.Core
 
 OLModuleTemplate {
     id: root
 
-    readonly property real baseRatate: !visible ? 0 : (index - ListView.view.currentIndex) * 90
-    property real rotateAngle: 0
+    readonly property int listviewLayout: SwipeView.view ? SwipeView.view.layoutState : ModuleView.ModuleLayoutState.InFullscreen
 
-    function isNextItem() {
-        var nextIndex = root.ListView.view.currentIndex + 1
-        return nextIndex >= root.ListView.view.count ? false : (nextIndex === index)
-    }
-
-    function isPreviousItem() {
-        var prevIndex = root.ListView.view.currentIndex - 1
-        return prevIndex < 0 ? false : (prevIndex === index)
-    }
-
-    visible: isNextItem() || isPreviousItem() || ListView.isCurrentItem
-    anchors.fill: parent
-
-    surface: Item {
+    Item {
+        id: surfaceItem
         anchors.fill: parent
 
         Rectangle {
-            width: 200
-            height: 200
-            anchors.centerIn: parent
+            anchors.fill: parent
             color: "green"
         }
     }
 
-    transform: Rotation {
-        origin.x: width
-        origin.y: 0
-        axis { x: 0; y: 1; z: 0 }
-        angle: baseRatate - rotateAngle
-    }
+    surface: surfaceItem
 
     TapHandler {
         id: tapHandler
 
         acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad | PointerDevice.TouchScreen
-        longPressThreshold: 3
+        longPressThreshold: 2
         gesturePolicy: TapHandler.WithinBounds
         onLongPressed: {
-            console.debug("loog pressed")
-            root.ListView.view.layoutState = ModuleView.ModuleLayoutState.InLayout
+            root.SwipeView.view.layoutState = ModuleView.ModuleLayoutState.InLayout
         }
     }
 
     states: [
         State {
             name: "IN_LAYOUT"
+            when: root.listviewLayout === ModuleView.ModuleLayoutState.InLayout
             PropertyChanges {
                 target: root
                 scale: 0.7
@@ -61,6 +42,7 @@ OLModuleTemplate {
         },
         State {
             name: "InFullscreen"
+            when: root.listviewLayout  === ModuleView.ModuleLayoutState.InFullscreen
             PropertyChanges {
                 target: root
                 scale: 1.0
@@ -72,6 +54,12 @@ OLModuleTemplate {
         PropertyAnimation {
             properties: "scale"
             easing.type: Easing.InCubic
+            duration: 200
         }
+    }
+
+    Component.onCompleted: {
+        if (information.name === "HomePage")
+            root.SwipeView.view.currentIndex = index
     }
 }

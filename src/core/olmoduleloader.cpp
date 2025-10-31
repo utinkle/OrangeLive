@@ -17,6 +17,7 @@
 #define TITLE_ALIAS_KEY "titleAlias"
 #define DEPENDS_KEY "depends"
 #define MODULE_TYPE "moduleType"
+#define AUTOLOAD_TYPE "autoLoad"
 #define SURFACE_PROP "surface"
 
 struct OLModuleData {
@@ -66,6 +67,7 @@ public:
         information.depends = properties.value(DEPENDS_KEY).toStringList();
         information.moduleType = OLModuleInformation::ModuleType(properties.value(MODULE_TYPE).toInt());
         information.workPath = path;
+        information.autoLoad = properties.value(AUTOLOAD_TYPE).toBool();
 
         auto moduleData = QSharedPointer<OLModuleData>::create();
         moduleData->loadStatus = OLModuleData::UNLOADED;
@@ -121,7 +123,7 @@ public:
     OLModuleTemplate *createModuleTemplate(const OLModuleInformation &information)
     {
         if (!this->moduleTemplate) {
-            qWarning() << "[OLModule] create module tempate before loading the module";
+            qWarning() << "[OLModule] Need create module tempate before loading the module";
             return nullptr;
         }
 
@@ -169,8 +171,9 @@ public:
 
         auto templateItem = createModuleTemplate(data->information);
 
-        if (auto item = findModuleSurfaceItem(templateItem))
+        if (auto item = findModuleSurfaceItem(templateItem)) {
             data->module->setSurfaceItem(item);
+        }
 
         QObject::connect(data->module.data(), &AppStartupModuleGroup::loadedChanged, qq, [&, templateItem]() {
             data->loadStatus = OLModuleData::LOADED;
@@ -267,6 +270,33 @@ public:
 
         return true;
     }
+
+    QList<AppStartupModuleInformation> resolveInformationByDir(const QString &dirpath)
+    {
+        QDir dir(dirpath);
+        QList<AppStartupModuleInformation> result;
+        const auto &entryList = dir.entryInfoList(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+
+        for (const auto &entry : entryList) {
+            auto splitList = entry.fileName().split(QChar('_'));
+            if (splitList.isEmpty())
+                continue;
+
+            if (splitList.first() != QLatin1String("libplugins"))
+                continue;
+
+            splitList.takeFirst();
+            if (splitList.isEmpty())
+                continue;
+
+            if (splitList.first() != QLatin1String("OLPlugin"))
+                continue;
+
+            result << AppStartupModuleInformation(entry.absoluteFilePath());
+        }
+
+        return result;
+    }
 };
 
 OLModuleLoader::OLModuleLoader(QQmlEngine *engine, QObject *parent)
@@ -279,23 +309,47 @@ OLModuleLoader::OLModuleLoader(QQmlEngine *engine, QObject *parent)
 QList<OLModuleInformation> OLModuleLoader::resolveModule(const QString &path)
 {
     QList<OLModuleInformation> result;
-    const auto &modules = AppStartupModuleGroup::loadFromPath(path);
-    if (modules.isEmpty())
-        return result;
+    const auto &moduleInfos = dd->resolveInformationByDir(path);
 
-    for (auto module : modules) {
-        const OLModuleInformation &information = dd->assignInformation(module, path);
-        result << information;
+    QSet<QPair<int, int>> processedPairs;
 
-        QSharedPointer<OLModuleVersionControl> vc;
-        if (dd->moduleVCHash.contains(information.name)) {
-            vc = dd->moduleVCHash.value(information.name);
-        } else {
-            vc = QSharedPointer<OLModuleVersionControl>::create(information.name, this);
-            dd->moduleVCHash.insert(information.name, vc);
+    for (int i = 0; i < moduleInfos.size(); ++i) {
+        for (int j = i + 1; j < moduleInfos.size(); ++j) {
+            if (processedPairs.contains({i, j}) || processedPairs.contains({j, i}))
+                continue;
+
+            if (moduleInfos[i].startModule() == moduleInfos[j].startModule()
+                || moduleInfos[i].appId() != moduleInfos[j].appId()
+                || moduleInfos[i].descriptor() != moduleInfos[j].descriptor()
+                || moduleInfos[i].version() != moduleInfos[j].version())
+                continue;
+
+            processedPairs.insert({i, j});
+
+            AppStartupModuleInformation preload = moduleInfos[i], entity = moduleInfos[j];
+            if (entity.startModule() == AppStartupModuleInformation::Preload) {
+                preload = moduleInfos[j];
+                entity = moduleInfos[i];
+            }
+
+            auto module = QSharedPointer<AppStartupModuleGroup>::create(std::make_pair(preload, entity));
+            if (!module->isValid())
+                continue;
+
+            const OLModuleInformation &information = dd->assignInformation(module, path);
+            result << information;
+
+            QSharedPointer<OLModuleVersionControl> vc;
+            if (dd->moduleVCHash.contains(information.name)) {
+                vc = dd->moduleVCHash.value(information.name);
+            } else {
+                vc = QSharedPointer<OLModuleVersionControl>::create(information.name, this);
+                dd->moduleVCHash.insert(information.name, vc);
+            }
+
+            vc->addVersion(information);
+            break;
         }
-
-        vc->addVersion(information);
     }
 
     return result;

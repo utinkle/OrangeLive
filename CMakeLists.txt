@@ -11,4 +11,6 @@ qt_standard_project_setup()
 add_subdirectory(src)
 add_subdirectory(third_party/CCQuickStartup)
 add_subdirectory(third_party/MobileUI/)
+add_subdirectory(modules/components/)
+add_subdirectory(modules/activity/)
 
