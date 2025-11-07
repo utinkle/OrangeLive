@@ -9,12 +9,10 @@ AppPreloadItem {
     id: root
 
     preloadSurface: AppPreloadItem.ItemSurface
-    loadingOverlay: Rectangle {
-        color: "blue"
-
-        Text {
+    loadingOverlay: Item {
+        BusyIndicator {
             anchors.centerIn: parent
-            text: "这是一个测试预览"
+            running: true
         }
     }
 

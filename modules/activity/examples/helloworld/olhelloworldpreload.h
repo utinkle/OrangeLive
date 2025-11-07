@@ -1,23 +1,23 @@
-#ifndef OLHOMEPAGEPRELOAD_H
-#define OLHOMEPAGEPRELOAD_H
+#ifndef OLHELLOWORLDPRELOAD_H
+#define OLHELLOWORLDPRELOAD_H
 
 #include <QObject>
 #include <QQmlEngine>
 
 #include "interface/appstartuppreloadinterface.h"
 
-class OLHomePagePreload : public QObject, public AppStartupPreloadInterface
+class OLHelloWorldPreload : public QObject, public AppStartupPreloadInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID AppStartupPreloadInterface_iid FILE "preload.json")
     Q_INTERFACES(AppStartupPreloadInterface)
 
 public:
-    explicit OLHomePagePreload(QObject *parent = nullptr);
-    ~OLHomePagePreload();
+    explicit OLHelloWorldPreload(QObject *parent = nullptr);
+    ~OLHelloWorldPreload();
 
     void aboutToPreload(QQmlApplicationEngine *engine);
     QUrl preloadModulePath() const;
 };
 
-#endif // OLHOMEPAGE_H
+#endif // OLHELLOWORLDPRELOAD_H

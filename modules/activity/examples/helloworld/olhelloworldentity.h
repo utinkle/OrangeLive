@@ -1,22 +1,22 @@
-#ifndef OLHOMEPAGENTITY_H
-#define OLHOMEPAGENTITY_H
+#ifndef OLHELLOWORLDENTITY_H
+#define OLHELLOWORLDENTITY_H
 
 #include <QObject>
 #include <QSharedPointer>
 
 #include "interface/appstartupentityinterface.h"
 
-class OLHomePageEntity : public QObject, public AppStartupEntityInterface
+class OLHelloWorldEntity : public QObject, public AppStartupEntityInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID AppStartupEntityInterface_iid FILE "entity.json")
     Q_INTERFACES(AppStartupEntityInterface)
 
 public:
-    explicit OLHomePageEntity(QObject *parent = nullptr);
-    ~OLHomePageEntity();
+    explicit OLHelloWorldEntity(QObject *parent = nullptr);
+    ~OLHelloWorldEntity();
 
     QUrl entityModulePath() const;
 };
 
-#endif // OLHOMEPAGENTITY_H
+#endif // OLHELLOWORLDENTITY_H

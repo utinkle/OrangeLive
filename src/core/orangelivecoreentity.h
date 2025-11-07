@@ -28,7 +28,7 @@ private:
     void installAndLoadDefaultModules();
 
 private:
-    QScopedPointer<OLModuleLoader> loader;
+    OLModuleLoader *loader;
 };
 
 #endif // ORANGELIVECOREENTITY_H

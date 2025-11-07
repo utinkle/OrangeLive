@@ -1,0 +1,6 @@
+file(GLOB AC_DIRS LIST_DIRECTORIES true "*")
+foreach(co_dir ${CO_DIRS})
+    if(IS_DIRECTORY ${co_dir} AND EXISTS ${co_dir}/CMakeLists.txt)
+        add_subdirectory(${co_dir})
+    endif()
+endforeach()

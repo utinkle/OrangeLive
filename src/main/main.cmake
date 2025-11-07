@@ -1,3 +1,4 @@
+set(CMAKE_AUTORCC ON)
 qt_add_executable(OrangeLive WIN32 MACOSX_BUNDLE
     ${CMAKE_CURRENT_LIST_DIR}/application.qrc
     ${CMAKE_CURRENT_LIST_DIR}/main.cpp

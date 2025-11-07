@@ -24,7 +24,7 @@ AppStartupItem {
             }
 
             Component.onCompleted: {
-                OLModuleLoader.moduleTemplate = Qt.createComponent("TemplateComponent.qml")
+                OLModuleLoader.moduleTemplate = Qt.createComponent("OLTemplate.qml")
             }
         }
     }

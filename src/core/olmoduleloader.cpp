@@ -8,6 +8,7 @@
 #include <QQmlEngine>
 #include <QUuid>
 #include <QQmlComponent>
+#include <QQmlProperty>
 
 #include <appstartupinstance.h>
 #include <items/appstartupmodulegroup.h>
@@ -19,6 +20,8 @@
 #define MODULE_TYPE "moduleType"
 #define AUTOLOAD_TYPE "autoLoad"
 #define SURFACE_PROP "surface"
+
+Q_GLOBAL_STATIC(OLModuleLoader *, _globalLoader)
 
 struct OLModuleData {
     enum LoadStatus {
@@ -50,6 +53,7 @@ public:
     QHash<QString, QSharedPointer<OLModuleData>> moduleMaps;
     QHash<QString, QSharedPointer<OLModuleVersionControl>> moduleVCHash;
     QList<QQuickItem *> runningModuleItems;
+    QQuickItem *moduleView;
 
 public:
     OLModuleInformation assignInformation(const QSharedPointer<AppStartupModuleGroup> &module, const QString &path)
@@ -61,6 +65,7 @@ public:
         information.version = module->preload().version();
 
         QVariantMap properties = module->preload().properties();
+
         information.title = properties.value(TITLE_KEY).toString();
         information.titleAlias = properties.value(TITLE_ALIAS_KEY).toString();
         information.productor = properties.value(PRODUCTOR_KEY).toString();
@@ -132,13 +137,13 @@ public:
             return nullptr;
 
         QQmlContext *context = new QQmlContext(engine);
-
         OLModuleTemplate *templateItem = qobject_cast<OLModuleTemplate *>(this->moduleTemplate->beginCreate(context));
         if (!templateItem) {
             qWarning() << "[OLModule] module template create failed";
             return nullptr;
         }
 
+        templateItem->setParentItem(moduleView);
         templateItem->setInformation(information);
 
         engine->setObjectOwnership(templateItem, QQmlEngine::CppOwnership);
@@ -292,7 +297,7 @@ public:
             if (splitList.first() != QLatin1String("OLPlugin"))
                 continue;
 
-            result << AppStartupModuleInformation(entry.absoluteFilePath());
+            result << std::move(AppStartupModuleInformation(entry.absoluteFilePath()));
         }
 
         return result;
@@ -304,6 +309,25 @@ OLModuleLoader::OLModuleLoader(QQmlEngine *engine, QObject *parent)
     , dd(new OLModuleLoaderPrivate(this))
 {
     dd->qml_engine = engine;
+}
+
+OLModuleLoader::~OLModuleLoader()
+{
+
+}
+
+OLModuleLoader *OLModuleLoader::create(QQmlEngine *engine, QObject *parent)
+{
+    if (!_globalLoader.exists()) {
+        *_globalLoader = new OLModuleLoader(engine, parent);
+    }
+
+    return *_globalLoader;
+}
+
+OLModuleLoader *OLModuleLoader::instance()
+{
+    return *_globalLoader;
 }
 
 QList<OLModuleInformation> OLModuleLoader::resolveModule(const QString &path)
@@ -441,6 +465,20 @@ void OLModuleLoader::setModuleTemplate(QQmlComponent *moduleTemplate)
     Q_EMIT moduleTemplateChanged();
 }
 
+QQuickItem *OLModuleLoader::moduleView() const
+{
+    return dd->moduleView;
+}
+
+void OLModuleLoader::setModuleView(QQuickItem *moduleView)
+{
+    if (dd->moduleView == moduleView)
+        return;
+
+    dd->moduleView = moduleView;
+    Q_EMIT moduleViewChanged();
+}
+
 QStringList OLModuleLoader::allModules() const
 {
     return dd->moduleNameIdHash.keys();
@@ -472,4 +510,214 @@ OLModuleInformation OLModuleLoader::moduleInformation(const QString &name)
     }
 
     return data->information;
+}
+
+class OLModulePagesAttachedPrivate {
+public:
+    OLModulePagesAttachedPrivate(OLModulePagesAttached *qq, QObject *attachedObject)
+        : qq(qq)
+        , _attachedObject(attachedObject)
+    {
+        if (!_attachedObject)
+            return;
+
+        QQuickItem *rootTemplate = findRootTemplateItem(_attachedObject);
+        if (rootTemplate)
+            bindToSwipeAttached(rootTemplate);
+    }
+
+    QQuickItem *findRootTemplateItem(QObject *obj)
+    {
+        auto p = obj ? qobject_cast<QQuickItem *>(obj->parent()) : nullptr;
+        while (p) {
+            if (QString(p->metaObject()->className()).startsWith(QLatin1String("OLTemplate"))) {
+                if (QQuickItem *item = qobject_cast<QQuickItem *>(p))
+                    return item;
+            }
+
+            p = p->parentItem();
+        }
+
+        return nullptr;
+    }
+
+    void bindToSwipeAttached(QObject *rootTemplate)
+    {
+        if (!rootTemplate)
+            return;
+
+        OLModuleLoader *loader = OLModuleLoader::instance();
+        if (!loader)
+            return;
+
+        QQuickItem *moduleView = loader->moduleView();
+        if (!moduleView)
+            return;
+
+        auto func = qmlAttachedPropertiesFunction(moduleView, QMetaType::fromName("QQuickSwipeView*").metaObject());
+        QObject *attached = qmlAttachedPropertiesObject(rootTemplate, func, true);
+        if (!attached)
+            return;
+
+        _swipeViewAttached = attached;
+        _swipeView = moduleView;
+
+        const char *_attachedSignals[] = {
+            "indexChanged()",
+            "isCurrentItemChanged()",
+            "isNextItemChanged()",
+            "isPreviousItemChanged()"
+        };
+
+        const char *_viewSignals[] = {
+            "layoutStateChanged()"
+        };
+
+        const char *slotSignature = "updateFromAttached()";
+
+        const QMetaObject *receiverMeta = qq->metaObject();
+        int recvMethodIndex = receiverMeta->indexOfMethod(QMetaObject::normalizedSignature(slotSignature));
+        QMetaMethod receiverMethod;
+        if (recvMethodIndex != -1)
+            receiverMethod = receiverMeta->method(recvMethodIndex);
+
+        const QMetaObject *attachedSenderMeta = _swipeViewAttached->metaObject();
+
+        for (auto sigName : _attachedSignals) {
+            int sigIndex = attachedSenderMeta->indexOfSignal(QMetaObject::normalizedSignature(sigName));
+            if (sigIndex == -1) {
+                continue;
+            }
+
+            QMetaMethod signalMethod = attachedSenderMeta->method(sigIndex);
+
+            bool connected = false;
+            if (recvMethodIndex != -1) {
+                QMetaObject::Connection c = QObject::connect(_swipeViewAttached, signalMethod, qq, receiverMethod);
+                connected = (c);
+            }
+            if (!connected) {
+                QObject::connect(_swipeViewAttached, sigName, qq, slotSignature);
+            }
+        }
+
+        const QMetaObject *viewSenderMeta = _swipeView->metaObject();
+
+        for (auto sigName : _viewSignals) {
+            int sigIndex = viewSenderMeta->indexOfSignal(QMetaObject::normalizedSignature(sigName));
+            if (sigIndex == -1) {
+                continue;
+            }
+
+            QMetaMethod signalMethod = viewSenderMeta->method(sigIndex);
+
+            bool connected = false;
+            if (recvMethodIndex != -1) {
+                QMetaObject::Connection c = QObject::connect(_swipeView, signalMethod, qq, receiverMethod);
+                connected = (c);
+            }
+            if (!connected) {
+                QObject::connect(_swipeView, sigName, qq, slotSignature);
+            }
+        }
+
+        QMetaObject::invokeMethod(qq, "updateFromAttached", Qt::QueuedConnection);
+    }
+
+    OLModulePagesAttached *qq;
+
+    QPointer<QObject> _attachedObject;
+    QPointer<QObject> _swipeViewAttached;
+    QPointer<QObject> _swipeView;
+
+    bool _isCurrentItem = false;
+    bool _isNextItem = false;
+    bool _isPreviousItem = false;
+    bool _active = false;
+    int _viewLayout = -1;
+    int _index = -1;
+};
+
+OLModulePagesAttached::OLModulePagesAttached(QObject *parent)
+    : QObject(parent)
+    , dd(new OLModulePagesAttachedPrivate(this, parent))
+{
+}
+
+OLModulePagesAttached::~OLModulePagesAttached()
+{
+
+}
+
+int OLModulePagesAttached::index() const
+{
+    return dd->_index;
+}
+
+bool OLModulePagesAttached::isCurrentItem() const
+{
+    return dd->_isCurrentItem;
+}
+
+bool OLModulePagesAttached::isNextItem() const
+{
+    return dd->_isNextItem;
+}
+
+bool OLModulePagesAttached::isPreviousItem() const
+{
+    return dd->_isPreviousItem;
+}
+
+bool OLModulePagesAttached::isActive() const
+{
+    return dd->_active;
+}
+
+OLModulePagesAttached *OLModulePagesAttached::qmlAttachedProperties(QObject *object)
+{
+    return new OLModulePagesAttached(object);
+}
+
+void OLModulePagesAttached::updateFromAttached()
+{
+    if (!dd->_swipeViewAttached)
+        return;
+
+    QQmlProperty pIndex(dd->_swipeViewAttached, "index");
+    QQmlProperty pCurrent(dd->_swipeViewAttached, "isCurrentItem");
+    QQmlProperty pNext(dd->_swipeViewAttached, "isNextItem");
+    QQmlProperty pPrev(dd->_swipeViewAttached, "isPreviousItem");
+    QQmlProperty pLayout(dd->_swipeView, "layoutState");
+
+    int newIndex = pIndex.read().toInt();
+    bool newCur = pCurrent.read().toBool();
+    bool newNext = pNext.read().toBool();
+    bool newPrev = pPrev.read().toBool();
+    bool newLayout = pLayout.read().toInt();
+
+    if (newIndex != dd->_index) {
+        dd->_index = newIndex;
+        Q_EMIT indexChanged();
+    }
+    if (newCur != dd->_isCurrentItem) {
+        dd->_isCurrentItem = newCur;
+        Q_EMIT isCurrentItemChanged();
+    }
+    if (newNext != dd->_isNextItem) {
+        dd->_isNextItem = newNext;
+        Q_EMIT isNextItemChanged();
+    }
+    if (newPrev != dd->_isPreviousItem) {
+        dd->_isPreviousItem = newPrev;
+        Q_EMIT isPreviousItemChanged();
+    }
+    if (newLayout != dd->_viewLayout) {
+        dd->_viewLayout = newLayout;
+    }
+    bool isActive = (dd->_viewLayout == 0) && (dd->_isCurrentItem);
+    if (dd->_active != isActive) {
+        dd->_active = isActive;
+        Q_EMIT isActiveChanged();
+    }
 }

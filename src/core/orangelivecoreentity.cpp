@@ -1,6 +1,7 @@
 #include "orangelivecoreentity.h"
 #include "olmoduleloader.h"
 #include "olmoduletemplate.h"
+#include "fileio.h"
 
 #include <QQmlContext>
 #include <QQmlApplicationEngine>
@@ -34,15 +35,19 @@ QUrl OrangeLiveCoreEntity::entityModulePath() const
 
 void OrangeLiveCoreEntity::initialize(QQmlApplicationEngine *engine)
 {
-    if (loader.isNull()) {
-        loader.reset(new OLModuleLoader(engine, this));
+    if (loader == nullptr) {
+        loader = OLModuleLoader::create(engine, this);
     }
 
     qmlRegisterType<OLModuleTemplate>("OL.Core", 1, 0, "OLModuleTemplate");
+    qmlRegisterType<FileIO>("OL.Core", 1, 0, "FileIO");
     qmlRegisterSingletonType<OLModuleLoader>("OL.Core", 1, 0, "OLModuleLoader",
                                              [&](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject *{
-        return loader.get();
+        return loader;
     });
+    qmlRegisterUncreatableType<OLModulePagesAttached>("OL.Core", 1, 0, "OLModulePage",
+        "Can't create OLModulePage attached type"
+    );
 
     initializeModuleInformation();
 }

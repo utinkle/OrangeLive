@@ -64,6 +64,8 @@ target_link_libraries(OrangeLiveCorePreload PRIVATE
     MobileUI::MobileUI
 )
 
+find_package(Qt6 REQUIRED COMPONENTS Core)
+
 qt_add_plugin(OrangeLiveCoreEntity
     SHARED
     PLUGIN_TYPE OLCore
@@ -77,6 +79,11 @@ qt_add_plugin(OrangeLiveCoreEntity
     olmoduleloader.cpp
     olmoduletemplate.h
     olmoduletemplate.cpp
+)
+
+target_sources(OrangeLiveCoreEntity
+  PRIVATE
+    fileio.h fileio.cpp
 )
 
 target_include_directories(OrangeLiveCoreEntity PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
@@ -102,4 +109,5 @@ target_link_libraries(OrangeLiveCoreEntity PRIVATE
     Qt::QuickControls2
     CCQuickStartup
 )
+target_link_libraries(OrangeLiveCoreEntity PRIVATE Qt6::Core)
 
