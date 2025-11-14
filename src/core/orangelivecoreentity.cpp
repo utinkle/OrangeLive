@@ -2,6 +2,7 @@
 #include "olmoduleloader.h"
 #include "olmoduletemplate.h"
 #include "fileio.h"
+#include "config/config.h"
 
 #include <QQmlContext>
 #include <QQmlApplicationEngine>
@@ -9,6 +10,7 @@
 #include <QLibraryInfo>
 #include <QFileInfo>
 #include <QDir>
+#include <QIcon>
 
 #include <appstartupinstance.h>
 #include <items/appstartupmodulegroup.h>
@@ -41,6 +43,8 @@ void OrangeLiveCoreEntity::initialize(QQmlApplicationEngine *engine)
 
     qmlRegisterType<OLModuleTemplate>("OL.Core", 1, 0, "OLModuleTemplate");
     qmlRegisterType<FileIO>("OL.Core", 1, 0, "FileIO");
+    qmlRegisterType<Config>("OL.Core", 1, 0, "Config");
+    qmlRegisterType<ConfigObject>("OL.Core", 1, 0, "ConfigObject");
     qmlRegisterSingletonType<OLModuleLoader>("OL.Core", 1, 0, "OLModuleLoader",
                                              [&](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject *{
         return loader;

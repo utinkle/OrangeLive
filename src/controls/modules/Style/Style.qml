@@ -4,6 +4,23 @@ import QtQuick
 import MobileUI
 
 QtObject {
+    enum Theme {
+        Light,
+        Dark
+    }
+
+    enum ScreenOrientation {
+        Unlocked = 0,
+
+        Portrait            = 1,
+        Portrait_upsidedown = 2,
+        Portrait_sensor     = 4,
+
+        Landscape_left      = 8,
+        Landscape_right     = 16,
+        Landscape_sensor    = 32
+    }
+
     readonly property MobileUI mobile: MobileUI {}
 
     readonly property color backgroundColor: "white"

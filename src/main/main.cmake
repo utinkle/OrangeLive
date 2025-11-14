@@ -20,10 +20,13 @@ set_target_properties(OrangeLive PROPERTIES
 )
 
 target_link_libraries(OrangeLive PRIVATE
-    Qt::Core
-    Qt::Gui
-    Qt::Quick
-    Qt::QuickControls2
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Quick
+    Qt6::QuickControls2
+    Qt6::Concurrent
+    Qt6::Sql
+    Qt6::Network
     CCQuickStartup
 )
 

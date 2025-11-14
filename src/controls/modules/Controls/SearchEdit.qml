@@ -3,7 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 
-import OrangeLive
+import OL.Provider
+import OL.Control
 
 LineEdit {
     id: control
@@ -64,7 +65,7 @@ LineEdit {
             spacing: Style.searchEdit.spacing
 
             // Search Icon
-            TokIcon {
+            OLIcon {
                 id: searchIcon
                 iconName: "search"
                 iconWidth: Style.smallIconSize

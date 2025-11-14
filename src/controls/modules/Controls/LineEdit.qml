@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 
-import OrangeLive
+import OL.Control
 
 TextField {
     id: control

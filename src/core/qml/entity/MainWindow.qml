@@ -31,6 +31,6 @@ AppStartupItem {
 
     onPopulateChanged: {
         // TODO: 更精确控制
-        Style.mobile.statusbarTheme = MobileUI.Dark
+        Style.mobile.statusbarTheme = Style.Dark
     }
 }

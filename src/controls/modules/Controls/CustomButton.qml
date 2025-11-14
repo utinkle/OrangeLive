@@ -2,7 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import OrangeLive
+import OL.Provider
+import OL.Control
 
 Button {
     id: root
@@ -17,7 +18,7 @@ Button {
         Component {
             id: iconComponent
 
-            TokIcon {
+            OLIcon {
                 iconName: icon.name
                 iconWidth: icon.width
                 iconHeight: icon.height

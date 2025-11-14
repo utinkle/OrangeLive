@@ -38,6 +38,12 @@ Item {
         NumberAnimation { duration: 200; easing.type: Easing.InCubic }
     }
 
+    onViewLayoutChanged: {
+        if (viewLayout === ModuleView.ModuleLayoutState.InLayout) {
+            Style.mobile.statusbarTheme = Style.Dark
+        }
+    }
+
     RowLayout {
         id: centralLayout
 
@@ -86,6 +92,7 @@ Item {
                         id: contentView
 
                         clip: true
+
                         readonly property real windowAspectRatio: Window.window.width / Window.window.height
                         property int layoutState: ModuleView.ModuleLayoutState.InFullscreen
 

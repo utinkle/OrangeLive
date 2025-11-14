@@ -3,11 +3,11 @@
 #include <QQuickWindow>
 #include <QUrlQuery>
 
-QUrl OrangeQmlInstance::toTokIconUrl(const QString &name, const QColor &color)
+QUrl OrangeQmlInstance::toIconUrl(const QString &name, const QColor &color)
 {
     QUrl url;
     url.setScheme("image");
-    url.setHost("toklive.icons");
+    url.setHost("ol.icons");
 
     QUrlQuery args;
     args.addQueryItem("name", name);

@@ -26,6 +26,7 @@ OLModuleTemplate {
     surface: surfaceItem
 
     Loader {
+        id: previewLoader
         active: root.SwipeView.view.layoutState === ModuleView.ModuleLayoutState.InLayout
         anchors.fill: parent
 

@@ -13,7 +13,7 @@ class OrangeQmlInstance : public QObject
     QML_SINGLETON
 
 public:
-    Q_INVOKABLE QUrl toTokIconUrl(const QString &name, const QColor &color);
+    Q_INVOKABLE QUrl toIconUrl(const QString &name, const QColor &color);
 };
 
 #endif // ORANGEQMLINSTANCE_H

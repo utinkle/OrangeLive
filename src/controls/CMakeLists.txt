@@ -7,7 +7,6 @@ set(QML_SOURCES
     modules/Controls/CustomButton.qml
     modules/Controls/LineEdit.qml
     modules/Controls/SearchEdit.qml
-    modules/Controls/TokIcon.qml
     modules/Style/CustomButtonStyle.qml
     modules/Style/SearchEditStyle.qml
 )
@@ -29,8 +28,6 @@ qt_add_qml_module(OrangeLiveControls
     PLUGIN_TARGET OrangeLiveControls
     OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/OL/Control
 )
-
-add_dependencies(OrangeLiveControls OrangeLiveProvider)
 
 target_include_directories(OrangeLiveControls
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/impl

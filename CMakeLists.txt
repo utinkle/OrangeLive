@@ -6,7 +6,7 @@ set(CMAKE_AUTOMOC ON)
 
 option(OL_BUILD_EXAMPLE_MODULES "Build the example modules" OFF)
 
-find_package(Qt6 REQUIRED COMPONENTS Gui Qml Quick QuickControls2)
+find_package(Qt6 REQUIRED COMPONENTS Gui Qml Quick QuickControls2 Concurrent Sql Network)
 
 qt_standard_project_setup()
 

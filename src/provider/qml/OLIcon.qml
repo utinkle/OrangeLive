@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 
-import OrangeLive
+import OL.Control
 
 Item {
     id: root
@@ -17,7 +17,7 @@ Item {
         id: icon
 
         anchors.centerIn: parent
-        source: OrangeLive.toTokIconUrl(iconName, iconColor)
+        source: OrangeLive.toIconUrl(iconName, iconColor)
         sourceSize: Qt.size(iconWidth, iconHeight)
         width: iconWidth
         height: iconHeight

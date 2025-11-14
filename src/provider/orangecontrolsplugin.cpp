@@ -7,8 +7,13 @@ class OrangeLiveProviderExtensionPlugin : public QQmlEngineExtensionPlugin {
     Q_PLUGIN_METADATA(IID QQmlEngineExtensionInterface_iid)
 
 public:
+    explicit OrangeLiveProviderExtensionPlugin(QObject *parent = nullptr)
+        : QQmlEngineExtensionPlugin(parent)
+    {
+    }
+
     void initializeEngine(QQmlEngine *engine, const char *uri) {
-        engine->addImageProvider("toklive.icons", new IconImageProvider());
+        engine->addImageProvider("ol.icons", new IconImageProvider());
     }
 };
 

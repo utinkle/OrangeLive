@@ -5,6 +5,7 @@
 #include <QIcon>
 #include <QUrl>
 #include <QColor>
+#include <QFont>
 
 class IconImageProvider : public QQuickImageProvider
 {

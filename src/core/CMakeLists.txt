@@ -4,7 +4,6 @@ project(OrangeLivePlugins LANGUAGES CXX)
 set(CMAKE_AUTOMOC ON)
 
 file(GLOB preload_qml_resource_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} qml/preload/*.qml)
-
 file(GLOB preload_img_resource_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} resources/*)
 
 qt_add_plugin(OrangeLiveCorePreload
@@ -64,7 +63,9 @@ target_link_libraries(OrangeLiveCorePreload PRIVATE
     MobileUI::MobileUI
 )
 
-find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Core Concurrent Sql)
+
+file(GLOB config_file_source RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} config/*)
 
 qt_add_plugin(OrangeLiveCoreEntity
     SHARED
@@ -79,11 +80,9 @@ qt_add_plugin(OrangeLiveCoreEntity
     olmoduleloader.cpp
     olmoduletemplate.h
     olmoduletemplate.cpp
-)
-
-target_sources(OrangeLiveCoreEntity
-  PRIVATE
-    fileio.h fileio.cpp
+    fileio.h
+    fileio.cpp
+    ${config_file_source}
 )
 
 target_include_directories(OrangeLiveCoreEntity PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
@@ -109,5 +108,5 @@ target_link_libraries(OrangeLiveCoreEntity PRIVATE
     Qt::QuickControls2
     CCQuickStartup
 )
-target_link_libraries(OrangeLiveCoreEntity PRIVATE Qt6::Core)
+target_link_libraries(OrangeLiveCoreEntity PRIVATE Qt6::Core Qt6::Concurrent Qt6::Sql)
 
