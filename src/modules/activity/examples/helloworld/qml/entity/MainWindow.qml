@@ -41,7 +41,7 @@ AppStartupItem {
 
     onPopulateChanged: {
         if (AppStartupItem.rect1.OLModulePage.isActive) {
-            Style.mobile.statusbarTheme = Style.Light
+            Style.mobile.statusbarTheme = Style.Dark
         }
     }
 }

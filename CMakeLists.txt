@@ -15,6 +15,4 @@ set(OL_MODULE_OUTPUT_DIR ${CMAKE_BINARY_DIR}/Extension/Modules)
 add_subdirectory(src)
 add_subdirectory(third_party/CCQuickStartup)
 add_subdirectory(third_party/MobileUI/)
-add_subdirectory(modules/components/)
-add_subdirectory(modules/activity/)
 

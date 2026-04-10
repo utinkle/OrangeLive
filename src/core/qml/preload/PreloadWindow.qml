@@ -33,7 +33,7 @@ AppPreloadItem {
         }
     }
 
-    autoExitOverlay: true
+    autoExitOverlay: false
     overlayExitWhen: !preloadCountdown.running
     transitionGroup:  FlickTransition {}
     initialProperties: InitialProperties {
@@ -45,5 +45,9 @@ AppPreloadItem {
         id: preloadCountdown
         interval: 10
         running: root.visible
+    }
+
+    Component.onCompleted: {
+        Style.mobile.statusbarTheme = Style.Light
     }
 }

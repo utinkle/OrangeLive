@@ -52,4 +52,8 @@ QtObject {
 
     readonly property SearchEditStyle searchEdit: SearchEditStyle {}
     readonly property CustomButtonStyle customButton: CustomButtonStyle {}
+
+    Component.onCompleted: {
+        mobile.refreshUI()
+    }
 }

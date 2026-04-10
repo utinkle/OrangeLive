@@ -143,6 +143,7 @@ public:
             return nullptr;
         }
 
+        templateItem->setParent(moduleView);
         templateItem->setParentItem(moduleView);
         templateItem->setInformation(information);
 
@@ -621,7 +622,18 @@ public:
             }
         }
 
-        QMetaObject::invokeMethod(qq, "updateFromAttached", Qt::QueuedConnection);
+        QQmlProperty pIndex(_swipeViewAttached, "index");
+        QQmlProperty pCurrent(_swipeViewAttached, "isCurrentItem");
+        QQmlProperty pNext(_swipeViewAttached, "isNextItem");
+        QQmlProperty pPrev(_swipeViewAttached, "isPreviousItem");
+        QQmlProperty pLayout(_swipeView, "layoutState");
+
+        _index = pIndex.read().toInt();
+        _isCurrentItem = pCurrent.read().toBool();
+        _isNextItem = pNext.read().toBool();
+        _isPreviousItem = pPrev.read().toBool();
+        _viewLayout = pLayout.read().toInt();
+        _active = (_viewLayout == 0) && (_isCurrentItem);
     }
 
     OLModulePagesAttached *qq;

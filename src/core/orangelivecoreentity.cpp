@@ -45,6 +45,7 @@ void OrangeLiveCoreEntity::initialize(QQmlApplicationEngine *engine)
     qmlRegisterType<FileIO>("OL.Core", 1, 0, "FileIO");
     qmlRegisterType<Config>("OL.Core", 1, 0, "Config");
     qmlRegisterType<ConfigObject>("OL.Core", 1, 0, "ConfigObject");
+    qmlRegisterType(QUrl("qrc:///OL.Core/qml/entity/OLLogoItem.qml"), "OL.Core", 1, 0, "OLLogoItem");
     qmlRegisterSingletonType<OLModuleLoader>("OL.Core", 1, 0, "OLModuleLoader",
                                              [&](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject *{
         return loader;
@@ -64,8 +65,7 @@ void OrangeLiveCoreEntity::finishedLoading(QQmlApplicationEngine *engine)
 
 void OrangeLiveCoreEntity::initializeModuleInformation()
 {
-    const QString &defaultModulePath = QLibraryInfo::path(QLibraryInfo::DataPath)
-                + QDir::separator() + ORANGE_ARCH_STRING;
+    const QString &defaultModulePath = qApp->applicationDirPath();
     AppStartupInstance::instance()->addModulePath(defaultModulePath);
     QDir defaultMouduleDir(defaultModulePath);
     loader->resolveModule(defaultMouduleDir.absolutePath());

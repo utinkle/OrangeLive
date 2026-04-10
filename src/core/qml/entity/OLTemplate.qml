@@ -16,11 +16,6 @@ OLModuleTemplate {
     Item {
         id: surfaceItem
         anchors.fill: parent
-
-        Rectangle {
-            anchors.fill: parent
-            color: "green"
-        }
     }
 
     surface: surfaceItem

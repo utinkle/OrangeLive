@@ -106,7 +106,9 @@ target_compile_definitions(OrangeLiveCoreEntity PRIVATE ORANGE_ARCH_STRING="${AN
 target_link_libraries(OrangeLiveCoreEntity PRIVATE
     Qt::Quick
     Qt::QuickControls2
+    Qt6::Core
+    Qt6::Concurrent
+    Qt6::Sql
     CCQuickStartup
 )
-target_link_libraries(OrangeLiveCoreEntity PRIVATE Qt6::Core Qt6::Concurrent Qt6::Sql)
 

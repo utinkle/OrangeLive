@@ -28,9 +28,4 @@ AppStartupItem {
             }
         }
     }
-
-    onPopulateChanged: {
-        // TODO: 更精确控制
-        Style.mobile.statusbarTheme = Style.Dark
-    }
 }
